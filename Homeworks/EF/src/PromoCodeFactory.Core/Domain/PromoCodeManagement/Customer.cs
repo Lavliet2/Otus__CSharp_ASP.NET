@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 {
-    public class Customer
-        : BaseEntity
+    public class Customer : BaseEntity
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -15,5 +14,9 @@ namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
         public string Email { get; set; }
 
         //TODO: Списки Preferences и Promocodes 
+        //public List<Preference> Preferences { get; set; }
+        public List<PromoCode> PromoCodes { get; set; } = new List<PromoCode>();
+        public List<CustomerPreference> CustomerPreferences { get; set; }
+
     }
 }
