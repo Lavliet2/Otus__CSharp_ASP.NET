@@ -2,8 +2,7 @@
 
 namespace PromoCodeFactory.DataAccess.Data
 {
-    public class EfDbInitializer
-        : IDbInitializer
+    public class EfDbInitializer: IDbInitializer
     {
         private readonly DataContext _dataContext;
 

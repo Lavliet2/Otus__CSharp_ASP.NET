@@ -8,8 +8,9 @@ using PromoCodeFactory.WebHost.Models;
 
 namespace PromoCodeFactory.WebHost.Controllers
 {
+
     /// <summary>
-    /// Роли сотрудников
+    /// Контроллер для работы с ролями сотрудников
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
@@ -36,7 +37,7 @@ namespace PromoCodeFactory.WebHost.Controllers
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    Description = x.Description
+                    Description = x.Description                    
                 }).ToList();
 
             return rolesModelList;
