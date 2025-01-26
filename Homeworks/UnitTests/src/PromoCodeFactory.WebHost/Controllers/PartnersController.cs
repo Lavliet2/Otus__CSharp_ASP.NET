@@ -14,8 +14,7 @@ namespace PromoCodeFactory.WebHost.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class PartnersController
-        : ControllerBase
+    public class PartnersController : ControllerBase
     {
         private readonly IRepository<Partner> _partnersRepository;
 
@@ -85,11 +84,14 @@ namespace PromoCodeFactory.WebHost.Controllers
             //Если партнер заблокирован, то нужно выдать исключение
             if (!partner.IsActive)
                 return BadRequest("Данный партнер не активен");
-            
+
             //Установка лимита партнеру
-            var activeLimit = partner.PartnerLimits.FirstOrDefault(x => 
-                !x.CancelDate.HasValue);
-            
+            //var activeLimit = partner.PartnerLimits.FirstOrDefault(x => 
+            //    !x.CancelDate.HasValue);
+            //Установка лимита партнеру и учитываем, что лимит активен только если CancelDate не задана И EndDate еще не прошла
+            var activeLimit = partner.PartnerLimits.FirstOrDefault(x =>
+                !x.CancelDate.HasValue && x.EndDate > DateTime.Now);
+
             if (activeLimit != null)
             {
                 //Если партнеру выставляется лимит, то мы 

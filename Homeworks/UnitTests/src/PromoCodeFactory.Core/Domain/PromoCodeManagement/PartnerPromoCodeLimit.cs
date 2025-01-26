@@ -2,7 +2,7 @@
 
 namespace PromoCodeFactory.Core.Domain.PromoCodeManagement
 {
-    public class PartnerPromoCodeLimit
+    public class PartnerPromoCodeLimit : BaseEntity
     {
         public Guid Id { get; set; }
 
