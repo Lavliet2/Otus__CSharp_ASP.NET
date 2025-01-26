@@ -21,8 +21,14 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ASP.NET/Homeworks/UnitTests/src/PromoCodeFactory.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build ASP.NET/Homeworks/UnitTests/src/PromoCodeFactory.sln --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test ASP.NET/Homeworks/UnitTests/src/PromoCodeFactory.sln --no-build --verbosity normal                
+    # - name: Restore dependencies
+    #   run: dotnet restore
+    # - name: Build
+    #   run: dotnet build --no-restore
+    # - name: Test
+    #   run: dotnet test --no-build --verbosity normal
