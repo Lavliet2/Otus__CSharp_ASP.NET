@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 //using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.Integration;
 using Pcf.GivingToCustomer.WebHost.Models;
-using Pcf.GivingToCustomer.Integration;
-using Pcf.Preference.Core.Models;
+
 
 namespace Pcf.GivingToCustomer.WebHost.Controllers
 {
