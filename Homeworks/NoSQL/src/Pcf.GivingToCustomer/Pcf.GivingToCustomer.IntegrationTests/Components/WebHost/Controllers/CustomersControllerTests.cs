@@ -8,6 +8,10 @@ using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.WebHost.Controllers;
 using Pcf.GivingToCustomer.WebHost.Models;
 using Xunit;
+using Pcf.GivingToCustomer.IntegrationTests.Fakes;
+using Pcf.GivingToCustomer.IntegrationTests.Data;
+
+using PreferenceEntity = Pcf.GivingToCustomer.Core.Domain.Preference;
 
 namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
 {
@@ -16,16 +20,19 @@ namespace Pcf.GivingToCustomer.IntegrationTests.Components.WebHost.Controllers
     {
         private readonly CustomersController _customersController;
         private readonly EfRepository<Customer> _customerRepository;
-        private readonly EfRepository<Preference> _preferenceRepository;
+        //private readonly EfRepository<Preference> _preferenceRepository;
         
         public CustomersControllerTests(EfDatabaseFixture efDatabaseFixture)
         {
             _customerRepository = new EfRepository<Customer>(efDatabaseFixture.DbContext);
-            _preferenceRepository = new EfRepository<Preference>(efDatabaseFixture.DbContext);
-            
+            var fakePreferences = TestDataFactory.Preferences;
+            var fakeGateway = new FakePreferenceGateway(fakePreferences);
+            //_preferenceRepository = new EfRepository<Preference>(efDatabaseFixture.DbContext);
+
             _customersController = new CustomersController(
-                _customerRepository, 
-                _preferenceRepository);
+                _customerRepository,
+                fakeGateway);
+                //_preferenceRepository);
         }
         
         [Fact]

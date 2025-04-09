@@ -7,6 +7,7 @@ using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.WebHost.Mappers;
 using Pcf.GivingToCustomer.WebHost.Models;
+using Pcf.GivingToCustomer.Integration;
 
 namespace Pcf.GivingToCustomer.WebHost.Controllers
 {
@@ -19,14 +20,18 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         : ControllerBase
     {
         private readonly IRepository<PromoCode> _promoCodesRepository;
-        private readonly IRepository<Preference> _preferencesRepository;
+        private readonly PreferenceGateway _preferenceGateway;
+        //private readonly IRepository<Preference> _preferencesRepository;
         private readonly IRepository<Customer> _customersRepository;
 
-        public PromocodesController(IRepository<PromoCode> promoCodesRepository, 
-            IRepository<Preference> preferencesRepository, IRepository<Customer> customersRepository)
+        public PromocodesController(IRepository<PromoCode> promoCodesRepository,
+                PreferenceGateway preferenceGateway,
+            //IRepository<Preference> preferencesRepository,
+            IRepository<Customer> customersRepository)
         {
             _promoCodesRepository = promoCodesRepository;
-            _preferencesRepository = preferencesRepository;
+            _preferenceGateway = preferenceGateway;
+            //_preferencesRepository = preferencesRepository;
             _customersRepository = customersRepository;
         }
         
@@ -60,7 +65,9 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         public async Task<IActionResult> GivePromoCodesToCustomersWithPreferenceAsync(GivePromoCodeRequest request)
         {
             //Получаем предпочтение по имени
-            var preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
+            var allPreferences = await _preferenceGateway.GetPreferencesAsync();
+            var preference = allPreferences.FirstOrDefault(p => p.Id == request.PreferenceId);
+            //var preference = await _preferencesRepository.GetByIdAsync(request.PreferenceId);
 
             if (preference == null)
             {

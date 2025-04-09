@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pcf.GivingToCustomer.Core.Abstractions.Repositories;
 using Pcf.GivingToCustomer.Core.Domain;
+using Pcf.GivingToCustomer.Integration;
 using Pcf.GivingToCustomer.WebHost.Mappers;
 using Pcf.GivingToCustomer.WebHost.Models;
+
+
 
 namespace Pcf.GivingToCustomer.WebHost.Controllers
 {
@@ -19,13 +22,17 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         : ControllerBase
     {
         private readonly IRepository<Customer> _customerRepository;
-        private readonly IRepository<Preference> _preferenceRepository;
+        private readonly PreferenceGateway _preferenceGateway;
+        //private readonly IRepository<Preference> _preferenceRepository;
 
-        public CustomersController(IRepository<Customer> customerRepository, 
-            IRepository<Preference> preferenceRepository)
+        public CustomersController(IRepository<Customer> customerRepository,
+            PreferenceGateway preferenceGateway)
+        //IRepository<Preference> preferenceRepository)
         {
             _customerRepository = customerRepository;
-            _preferenceRepository = preferenceRepository;
+            _preferenceGateway = preferenceGateway;
+            //_customerRepository = customerRepository;
+            //_preferenceRepository = preferenceRepository;
         }
         
         /// <summary>
@@ -71,8 +78,13 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
         public async Task<ActionResult<CustomerResponse>> CreateCustomerAsync(CreateOrEditCustomerRequest request)
         {
             //Получаем предпочтения из бд и сохраняем большой объект
-            var preferences = await _preferenceRepository
-                .GetRangeByIdsAsync(request.PreferenceIds);
+            var allPreferences = await _preferenceGateway.GetPreferencesAsync();
+            var preferences = allPreferences
+                .Where(p => request.PreferenceIds.Contains(p.Id))
+                .Select(p => new Core.Domain.Preference{ Id = p.Id, Name = p.Name })
+                .ToList();
+            //var preferences = await _preferenceRepository
+            //    .GetRangeByIdsAsync(request.PreferenceIds);
 
             Customer customer = CustomerMapper.MapFromModel(request, preferences);
             
@@ -93,9 +105,15 @@ namespace Pcf.GivingToCustomer.WebHost.Controllers
             
             if (customer == null)
                 return NotFound();
-            
-            var preferences = await _preferenceRepository.GetRangeByIdsAsync(request.PreferenceIds);
-            
+
+            var allPreferences = await _preferenceGateway.GetPreferencesAsync();
+            var preferences = allPreferences
+                .Where(p => request.PreferenceIds.Contains(p.Id))
+                .Select(p => new Core.Domain.Preference { Id = p.Id, Name = p.Name })
+                .ToList();
+
+            //var preferences = await _preferenceRepository.GetRangeByIdsAsync(request.PreferenceIds);
+
             CustomerMapper.MapFromModel(request, preferences, customer);
 
             await _customerRepository.UpdateAsync(customer);

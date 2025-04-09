@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.WebHost.Models;
 
- namespace Pcf.GivingToCustomer.WebHost.Mappers
+using DomainPreference = Pcf.GivingToCustomer.Core.Domain.Preference;
+
+namespace Pcf.GivingToCustomer.WebHost.Mappers
 {
     public class PromoCodeMapper
     {
-        public static PromoCode MapFromModel(GivePromoCodeRequest request, Preference preference, IEnumerable<Customer> customers) {
+        public static PromoCode MapFromModel(GivePromoCodeRequest request, DomainPreference preference, IEnumerable<Customer> customers) {
 
             var promocode = new PromoCode();
             promocode.Id = request.PromoCodeId;

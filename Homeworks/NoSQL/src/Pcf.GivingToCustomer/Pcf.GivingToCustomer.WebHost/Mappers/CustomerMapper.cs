@@ -5,12 +5,18 @@ using System.Threading.Tasks;
 using Pcf.GivingToCustomer.Core.Domain;
 using Pcf.GivingToCustomer.WebHost.Models;
 
+using DomainPreference = Pcf.GivingToCustomer.Core.Domain.Preference;
+
 namespace Pcf.GivingToCustomer.WebHost.Mappers
 {
     public class CustomerMapper
     {
 
-        public static Customer MapFromModel(CreateOrEditCustomerRequest model, IEnumerable<Preference> preferences, Customer customer = null)
+        public static Customer MapFromModel(
+            CreateOrEditCustomerRequest model,
+             IEnumerable<DomainPreference> preferences,
+            //IEnumerable<Preference> preferences,
+            Customer customer = null)
         {
             if(customer == null)
             {

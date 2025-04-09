@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Pcf.GivingToCustomer.Core\Pcf.GivingToCustomer.Core.csproj" />
+      <ProjectReference Include="..\..\Pcf.Preference\Pcf.Preference.Core\Pcf.Preference.Core.csproj" />
     </ItemGroup>
 
 </Project>
