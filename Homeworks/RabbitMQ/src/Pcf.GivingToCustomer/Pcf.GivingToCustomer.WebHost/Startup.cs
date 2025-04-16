@@ -14,6 +14,8 @@ using Pcf.GivingToCustomer.DataAccess.Repositories;
 using Pcf.GivingToCustomer.Integration;
 using MassTransit;
 using Pcf.GivingToCustomer.WebHost.Consumers;
+using Pcf.GivingToCustomer.Core.Abstractions.Services;
+using Pcf.GivingToCustomer.WebHost.Services;
 
 namespace Pcf.GivingToCustomer.WebHost
 {
@@ -55,6 +57,7 @@ namespace Pcf.GivingToCustomer.WebHost
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
+            services.AddScoped<IPromoCodeService, PromoCodeService>();
             services.AddDbContext<DataContext>(x =>
             {
                 //x.UseSqlite("Filename=PromocodeFactoryGivingToCustomerDb.sqlite");

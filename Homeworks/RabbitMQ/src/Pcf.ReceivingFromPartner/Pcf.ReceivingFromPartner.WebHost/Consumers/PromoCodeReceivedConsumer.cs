@@ -17,7 +17,7 @@ namespace Pcf.ReceivingFromPartner.WebHost.Consumers
         public Task Consume(ConsumeContext<PromoCodeReceivedEvent> context)
         {
             _logger.LogInformation("Partner service received promo code: {PromoCode}", context.Message.PromoCode);
-            // TODO: логика партнёрского сервиса
+            // TODO: на будущее
             return Task.CompletedTask;
         }
     }
