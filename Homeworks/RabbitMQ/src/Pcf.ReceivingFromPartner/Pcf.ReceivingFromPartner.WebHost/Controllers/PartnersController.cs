@@ -8,6 +8,8 @@ using Pcf.ReceivingFromPartner.Core.Domain;
 using Pcf.ReceivingFromPartner.Core.Abstractions.Gateways;
 using Pcf.ReceivingFromPartner.WebHost.Models;
 using Pcf.ReceivingFromPartner.WebHost.Mappers;
+using MassTransit;
+using Pcf.Shared.Events;
 
 namespace Pcf.ReceivingFromPartner.WebHost.Controllers
 {
@@ -24,18 +26,22 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
         private readonly INotificationGateway _notificationGateway;
         private readonly IGivingPromoCodeToCustomerGateway _givingPromoCodeToCustomerGateway;
         private readonly IAdministrationGateway _administrationGateway;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public PartnersController(IRepository<Partner> partnersRepository,
+        public PartnersController(
+            IRepository<Partner> partnersRepository,
             IRepository<Preference> preferencesRepository,
             INotificationGateway notificationGateway,
             IGivingPromoCodeToCustomerGateway givingPromoCodeToCustomerGateway,
-            IAdministrationGateway administrationGateway)
+            IAdministrationGateway administrationGateway,
+            IPublishEndpoint publishEndpoint)
         {
             _partnersRepository = partnersRepository;
             _preferencesRepository = preferencesRepository;
             _notificationGateway = notificationGateway;
             _givingPromoCodeToCustomerGateway = givingPromoCodeToCustomerGateway;
             _administrationGateway = administrationGateway;
+            _publishEndpoint = publishEndpoint;
         }
 
         /// <summary>
@@ -336,11 +342,15 @@ namespace Pcf.ReceivingFromPartner.WebHost.Controllers
 
             //TODO: Чтобы информация о том, что промокод был выдан парнером была отправлена
             //в микросервис администрирования нужно либо вызвать его API, либо отправить событие в очередь
-
-            if (request.PartnerManagerId.HasValue)
-            {
-                await _administrationGateway.NotifyAdminAboutPartnerManagerPromoCode(request.PartnerManagerId.Value);
-            }
+            await _publishEndpoint.Publish(new PromoCodeReceivedEvent(
+                PartnerName: partner.Name,
+                PromoCode: promoCode.Code,
+                ManagerId: promoCode.PartnerManagerId
+            ));
+            //if (request.PartnerManagerId.HasValue)
+            //{
+            //    await _administrationGateway.NotifyAdminAboutPartnerManagerPromoCode(request.PartnerManagerId.Value);
+            //}
 
             return CreatedAtAction(nameof(GetPartnerPromoCodeAsync),
                 new { id = partner.Id, promoCodeId = promoCode.Id }, null);

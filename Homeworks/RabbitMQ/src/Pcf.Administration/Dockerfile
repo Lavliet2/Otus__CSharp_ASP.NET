@@ -1,21 +1,23 @@
-# Prepare the build stage
+# build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy the solution file and project files, then restore dependencies
-COPY *.sln .
-COPY */*.csproj ./
-RUN for file in $(ls *.csproj); do mkdir -p ${file%.*} && mv $file ${file%.*}; done
-RUN dotnet restore
+COPY Pcf.sln ./
+COPY Pcf.Shared/Pcf.Shared.csproj Pcf.Shared/
+COPY Pcf.Administration/Pcf.Administration.Core/Pcf.Administration.Core.csproj Pcf.Administration/Pcf.Administration.Core/
+COPY Pcf.Administration/Pcf.Administration.DataAccess/Pcf.Administration.DataAccess.csproj Pcf.Administration/Pcf.Administration.DataAccess/
+COPY Pcf.Administration/Pcf.Administration.WebHost/Pcf.Administration.WebHost.csproj Pcf.Administration/Pcf.Administration.WebHost/
 
-# Copy the remaining files and publish the application
-COPY . ./aspnetapp
-WORKDIR /app/aspnetapp
-RUN dotnet publish -c Release -o out
+RUN dotnet restore Pcf.Administration/Pcf.Administration.WebHost/Pcf.Administration.WebHost.csproj
 
-# Use the .NET 8 runtime for the final stage
+COPY Pcf.Shared/ Pcf.Shared/
+COPY Pcf.Administration/ Pcf.Administration/
+
+WORKDIR /app/Pcf.Administration/Pcf.Administration.WebHost
+RUN dotnet publish -c Release -o /app/out
+
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/aspnetapp/out ./
+COPY --from=build /app/out ./
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Pcf.Administration.WebHost.dll"]

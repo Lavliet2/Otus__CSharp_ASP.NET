@@ -10,6 +10,11 @@ using Pcf.Administration.DataAccess.Repositories;
 using Pcf.Administration.DataAccess.Data;
 using Pcf.Administration.Core.Abstractions.Repositories;
 using System;
+using MassTransit;
+using Pcf.Administration.WebHost.Consumers;
+using Pcf.Administration.Core.Abstractions.Services;
+using Pcf.Administration.Services;
+
 
 namespace Pcf.Administration.WebHost
 {
@@ -28,7 +33,28 @@ namespace Pcf.Administration.WebHost
         {
             services.AddControllers().AddMvcOptions(x =>
                 x.SuppressAsyncSuffixInActionNames = false);
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<PartnerCreatedConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    var rabbitConfig = Configuration.GetSection("RabbitMq");
+                    cfg.Host(rabbitConfig["Host"], rabbitConfig["VirtualHost"], h =>
+                    {
+                        h.Username(rabbitConfig["Username"]);
+                        h.Password(rabbitConfig["Password"]);
+                    });
+
+                    cfg.ReceiveEndpoint("admin-partner-created-queue", e =>
+                    {
+                        e.ConfigureConsumer<PartnerCreatedConsumer>(context);
+                    });
+                });
+            });
+
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+            services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
             services.AddDbContext<DataContext>(x =>
             {
@@ -58,6 +84,7 @@ namespace Pcf.Administration.WebHost
             {
                 app.UseHsts();
             }
+
 
             app.UseOpenApi();
             app.UseSwaggerUi(x =>

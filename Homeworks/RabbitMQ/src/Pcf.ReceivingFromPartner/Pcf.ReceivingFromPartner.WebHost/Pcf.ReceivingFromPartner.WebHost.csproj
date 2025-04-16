@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Pcf.Shared\Pcf.Shared.csproj" />
+      <ProjectReference Include="..\..\Pcf.Administration\Pcf.Administration.WebHost\Pcf.Administration.WebHost.csproj" />
       <ProjectReference Include="..\Pcf.ReceivingFromPartner.Core\Pcf.ReceivingFromPartner.Core.csproj" />
       <ProjectReference Include="..\Pcf.ReceivingFromPartner.DataAccess\Pcf.ReceivingFromPartner.DataAccess.csproj" />
       <ProjectReference Include="..\Pcf.ReceivingFromPartner.Integration\Pcf.ReceivingFromPartner.Integration.csproj" />
@@ -14,6 +16,8 @@
 
     <ItemGroup>
       <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
+      <PackageReference Include="MassTransit" Version="8.4.0" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.4.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.7" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />

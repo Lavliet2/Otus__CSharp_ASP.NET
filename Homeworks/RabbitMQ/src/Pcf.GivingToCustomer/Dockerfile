@@ -1,21 +1,23 @@
-# Prepare the build stage
+# build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy the solution file and project files, then restore dependencies
-COPY *.sln .
-COPY */*.csproj ./
-RUN for file in $(ls *.csproj); do mkdir -p ${file%.*} && mv $file ${file%.*}; done
-RUN dotnet restore
+COPY Pcf.sln ./
+COPY Pcf.Shared/Pcf.Shared.csproj Pcf.Shared/
+COPY Pcf.GivingToCustomer/Pcf.GivingToCustomer.Core/Pcf.GivingToCustomer.Core.csproj Pcf.GivingToCustomer/Pcf.GivingToCustomer.Core/
+COPY Pcf.GivingToCustomer/Pcf.GivingToCustomer.DataAccess/Pcf.GivingToCustomer.DataAccess.csproj Pcf.GivingToCustomer/Pcf.GivingToCustomer.DataAccess/
+COPY Pcf.GivingToCustomer/Pcf.GivingToCustomer.WebHost/Pcf.GivingToCustomer.WebHost.csproj Pcf.GivingToCustomer/Pcf.GivingToCustomer.WebHost/
 
-# Copy the remaining files and publish the application
-COPY . ./aspnetapp
-WORKDIR /app/aspnetapp
-RUN dotnet publish -c Release -o out
+RUN dotnet restore Pcf.GivingToCustomer/Pcf.GivingToCustomer.WebHost/Pcf.GivingToCustomer.WebHost.csproj
 
-# Use the .NET 8 runtime for the final stage
+COPY Pcf.Shared/ Pcf.Shared/
+COPY Pcf.GivingToCustomer/ Pcf.GivingToCustomer/
+
+WORKDIR /app/Pcf.GivingToCustomer/Pcf.GivingToCustomer.WebHost
+RUN dotnet publish -c Release -o /app/out
+
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/aspnetapp/out ./
+COPY --from=build /app/out ./
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Pcf.GivingToCustomer.WebHost.dll"]

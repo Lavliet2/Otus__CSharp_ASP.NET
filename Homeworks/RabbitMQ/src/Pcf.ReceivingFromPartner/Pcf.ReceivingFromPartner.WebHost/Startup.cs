@@ -12,6 +12,8 @@ using Pcf.ReceivingFromPartner.DataAccess;
 using Pcf.ReceivingFromPartner.DataAccess.Repositories;
 using Pcf.ReceivingFromPartner.DataAccess.Data;
 using Pcf.ReceivingFromPartner.Integration;
+using MassTransit;
+using Pcf.ReceivingFromPartner.WebHost.Consumers;
 
 namespace Pcf.ReceivingFromPartner.WebHost
 {
@@ -30,6 +32,25 @@ namespace Pcf.ReceivingFromPartner.WebHost
         {
             services.AddControllers().AddMvcOptions(x =>
                 x.SuppressAsyncSuffixInActionNames = false);
+            services.AddMassTransit(x =>
+            {
+                x.AddConsumer<PromoCodeReceivedConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    var rabbitConfig = Configuration.GetSection("RabbitMq");
+                    cfg.Host(rabbitConfig["Host"], rabbitConfig["VirtualHost"], h =>
+                    {
+                        h.Username(rabbitConfig["Username"]);
+                        h.Password(rabbitConfig["Password"]);
+                    });
+
+                    cfg.ReceiveEndpoint("promo-code-received-queue", e =>
+                    {
+                        e.ConfigureConsumer<PromoCodeReceivedConsumer>(context);
+                    });
+                });
+            });
             services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
